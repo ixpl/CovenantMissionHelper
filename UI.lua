@@ -181,8 +181,8 @@ local function createPredictButton(frame)
 
     local predictButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     frame.predictButton = predictButton
-        predictButton:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
-        predictButton:SetPoint("LEFT", frame, "CENTER", PADDING/2, 0)
+        predictButton:SetSize(BUTTON_WIDTH * 2 / 3, BUTTON_HEIGHT)
+        predictButton:SetPoint("LEFT", frame, "CENTER", PADDING/2 + BUTTON_WIDTH / 3, 0)
         predictButton:SetText('Simulate')
         predictButton:SetMotionScriptsWhileDisabled(true)
         predictButton:SetScript('onClick', onClick)
@@ -216,14 +216,49 @@ local function createBestDispositionButton(frame)
 
     local BestDispositionButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
     frame.BestDispositionButton = BestDispositionButton
-        BestDispositionButton:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
-        BestDispositionButton:SetPoint("RIGHT", frame, "CENTER", -PADDING/2, 0)
+        BestDispositionButton:SetSize(BUTTON_WIDTH * 2 / 3, BUTTON_HEIGHT)
+        BestDispositionButton:SetPoint("RIGHT", frame, "CENTER", -PADDING/2 - BUTTON_WIDTH / 3, 0)
         BestDispositionButton:SetText('Optimize')
         BestDispositionButton:SetMotionScriptsWhileDisabled(true)
         BestDispositionButton:SetScript('onClick', onClick)
         BestDispositionButton:SetScript('onEnter', onEnter)
         BestDispositionButton:SetScript('onLeave', onLeave)
         BestDispositionButton:Hide()
+end
+
+local function createBestDispositionPercButton(frame)
+    local function onClick(self)
+        if self:IsEnabled() then MissionHelper:findBestDispositionPerc() end
+    end
+
+    local function onEnter(self)
+        GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
+        GameTooltip:SetPoint("TOPLEFT", self, "BOTTOMRIGHT", 0, 0)
+
+        if self:IsEnabled() then
+            GameTooltip_AddNormalLine(GameTooltip, "Change the order of your troops to minimize HP %")
+            GameTooltip_AddColoredLine(GameTooltip, "It shuffles only units on board and doesn't consider others", RED_FONT_COLOR)
+        else
+            GameTooltip_AddColoredLine(GameTooltip, "Addon doesn't support " .. '"Optimize %" if units have random abilities', RED_FONT_COLOR)
+        end
+
+        GameTooltip:Show()
+    end
+
+    local function onLeave()
+        GameTooltip_Hide()
+    end
+
+    local BestDispositionPercButton = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+    frame.BestDispositionPercButton = BestDispositionPercButton
+        BestDispositionPercButton:SetSize(BUTTON_WIDTH * 2 / 3, BUTTON_HEIGHT)
+        BestDispositionPercButton:SetPoint("CENTER", frame, "CENTER", 0, 0)
+        BestDispositionPercButton:SetText('Optimize % ')
+        BestDispositionPercButton:SetMotionScriptsWhileDisabled(true)
+        BestDispositionPercButton:SetScript('onClick', onClick)
+        BestDispositionPercButton:SetScript('onEnter', onEnter)
+        BestDispositionPercButton:SetScript('onLeave', onLeave)
+        BestDispositionPercButton:Hide()
 end
 
 local function createButtonsFrame(mainFrame)
@@ -237,6 +272,7 @@ local function createButtonsFrame(mainFrame)
 
 
     createBestDispositionButton(buttonsFrame)
+    createBestDispositionPercButton(buttonsFrame)
     createPredictButton(buttonsFrame)
 end
 

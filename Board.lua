@@ -341,19 +341,45 @@ function Board:getTotalLostHP(isWin)
     for i = _start, _end do
         if self.units[i] and self.units[i].isAutoTroop == false then
             if self.units[i].isWinLvlUp then
-                restHP = restHP + self.units[i].maxHealth
+                restHP = restHP + self.units[i].maxBaseHealth
             elseif self:isUnitAlive(i) then
-                restHP = restHP + self.units[i].currentHealth
+                if self.units[i].currentHealth > self.units[i].maxBaseHealth then
+                    restHP = restHP + self.units[i].maxBaseHealth
+                else
+                    restHP = restHP + self.units[i].currentHealth
+                end
             end
         end
     end
-
+    
     return startHP - restHP
+end
+
+function Board:getTotalLostHPPerc(isWin)
+    local restHPPerc = 0
+    local _start, _end, startHPPerc = 0, 4, 0
+    if not isWin then _start, _end, startHP = 5, 12, self.initialEnemiesHP end
+    for i = _start, _end do
+        if self.units[i] and self.units[i].isAutoTroop == false then
+            startHPPerc = startHPPerc + self.units[i].startHealth / self.units[i].maxBaseHealth
+            if self.units[i].isWinLvlUp then
+                restHPPerc = restHPPerc + 1
+            elseif self:isUnitAlive(i) then
+                if self.units[i].currentHealth > self.units[i].maxBaseHealth then
+                    restHPPerc = restHPPerc + 1
+                else
+                    restHPPerc = restHPPerc + self.units[i].currentHealth / self.units[i].maxBaseHealth
+                end
+            end
+        end
+    end
+    
+    return math.floor(10000 * (startHPPerc - restHPPerc) + 0.5) / 100
 end
 
 function Board:getMyTeam()
     local function constructString(unit, isWin)
-        local result = unit.name .. '. HP = ' .. unit.currentHealth .. '/' .. unit.maxHealth .. '\n'
+        local result = unit.name .. '. HP = ' .. unit.currentHealth .. '/' .. unit.maxBaseHealth .. '\n'
         --result = unit.isWinLvlUp and result .. ' (Level Up)\n' or result .. '\n'
         if (isWin and unit.isWinLvlUp) or (not isWin and unit.isLoseLvlUp) then result = LVL_UP_ICON .. result end
         if unit.currentHealth == 0 then result = SKULL_ICON .. result end
@@ -366,6 +392,7 @@ function Board:getMyTeam()
 
     local isWin = self:isWin()
     local lostHP = self:getTotalLostHP(true)
+    local lostHPPerc = self:getTotalLostHPPerc(true)
     local loseOrGain = lostHP >= 0 and 'LOST' or 'RECEIVED'
     local warningText = self.hasRandomSpells and "|cFFFF0000Units have random abilities. Actual rest HP may not be the same as predicted|r\n" or ''
 
@@ -375,7 +402,7 @@ function Board:getMyTeam()
             text = text .. constructString(self.units[i], isWin)
         end
     end
-    text = string.format("%sMy units:\n%s \n\nTOTAL %s HP = %s", warningText, text, loseOrGain, math.abs(lostHP))
+    text = string.format("%sMy units:\n%s \n\nTOTAL %s HP = %s (%s%s)", warningText, text, loseOrGain, math.abs(lostHP), math.abs(lostHPPerc), "%")
 
     return text
 end

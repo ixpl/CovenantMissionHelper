@@ -62,6 +62,26 @@ function MetaBoard:findBestDisposition()
     return next(bestBoard) ~= nil and bestBoard or self.baseBoard
 end
 
+function MetaBoard:findBestDispositionPerc()
+    local bestBoard, bestLostHP = {}, 9999999
+    for board in self:findBestDispositionIterator() do
+        board:simulate()
+        local lostHP = board:getTotalLostHPPerc(board:isWin())
+        if board:isWin() then
+            if lostHP < bestLostHP then
+                bestLostHP = lostHP
+                bestBoard = board
+            end
+        end
+
+        wipe(CMH.Board.CombatLog)
+        wipe(CMH.Board.HiddenCombatLog)
+        wipe(CMH.Board.CombatLogEvents)
+    end
+
+    return next(bestBoard) ~= nil and bestBoard or self.baseBoard
+end
+
 function MetaBoard:findBestDispositionIterator()
     -- unique subs only
     local hash = {}

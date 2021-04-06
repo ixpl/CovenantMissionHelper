@@ -102,6 +102,24 @@ function MissionHelper:findBestDisposition()
     MissionHelper:showResult(MissionHelperFrame.board)
 end
 
+function MissionHelper:findBestDispositionPerc()
+    local missionPage = CovenantMissionFrame:GetMissionPage()
+    local metaBoard = CMH.MetaBoard:new(missionPage, false)
+
+    MissionHelper:clearBoard(missionPage)
+    MissionHelperFrame.board = metaBoard:findBestDispositionPerc()
+
+    for _, unit in pairs(MissionHelperFrame.board.units) do
+        if unit.boardIndex < 5 then
+            local followerInfo = C_Garrison.GetFollowerInfo(unit.followerGUID)
+            followerInfo.autoCombatSpells = C_Garrison.GetFollowerAutoCombatSpells(unit.followerGUID, followerInfo.level);
+            CovenantMissionFrame:AssignFollowerToMission(missionPage.Board:GetFrameByBoardIndex(unit.boardIndex), followerInfo)
+        end
+    end
+
+    MissionHelper:showResult(MissionHelperFrame.board)
+end
+
 function MissionHelper:showResult(board)
     --print('hook show result')
     local combatLogMessageFrame = MissionHelperFrame.combatLogFrame.CombatLogMessageFrame

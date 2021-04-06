@@ -50,16 +50,21 @@ end
 
 function MissionHelperFrame:hideBestDispositionButton()
     self.buttonsFrame.BestDispositionButton:Hide()
+    self.buttonsFrame.BestDispositionPercButton:Hide()
 end
 
 function MissionHelperFrame:disableBestDispositionButton()
     self.buttonsFrame.BestDispositionButton:Show()
     self.buttonsFrame.BestDispositionButton:Disable()
+    self.buttonsFrame.BestDispositionPercButton:Show()
+    self.buttonsFrame.BestDispositionPercButton:Disable()
 end
 
 function MissionHelperFrame:enableBestDispositionButton()
     self.buttonsFrame.BestDispositionButton:Show()
     self.buttonsFrame.BestDispositionButton:Enable()
+    self.buttonsFrame.BestDispositionPercButton:Show()
+    self.buttonsFrame.BestDispositionPercButton:Enable()
 end
 
 function MissionHelperFrame:disablePredictButton()
