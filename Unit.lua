@@ -20,6 +20,7 @@ function Unit:new(blizzardUnitInfo)
                 or blizzardUnitInfo.portraitFileDataID or blizzardUnitInfo.portraitIconID,
         followerGUID = blizzardUnitInfo.followerGUID,
         name = blizzardUnitInfo.name,
+        level = blizzardUnitInfo.level,
         maxHealth = blizzardUnitInfo.maxHealth,
         maxBaseHealth = blizzardUnitInfo.maxHealth,
         currentHealth = blizzardUnitInfo.health,
@@ -47,6 +48,7 @@ function Unit:new(blizzardUnitInfo)
 end
 
 function Unit:getAttackType(autoCombatSpells)
+    if autoCombatSpells[1] == nil then return (self.role == 1 or self.role == 5) and 11 or 15 end
     local spellID = autoCombatSpells[1].autoCombatSpellID
     if CMH.DataTables.UnusualAttackType[spellID] ~= nil and CMH.DataTables.UnusualAttackType[spellID][self.ID] ~= nil then
         return CMH.DataTables.UnusualAttackType[spellID][self.ID]
